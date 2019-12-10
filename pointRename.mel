@@ -1,0 +1,22 @@
+/*
+Author:  José Torres
+Date:    10/25/2018
+Description:
+
+Takes the selection attribute of  name and renames the point.
+*/
+string $newSel[] = `ls -sl`;
+string $attrStr;
+
+//Iterate through objects and check for the .Selections attribute
+for ($i = 0; $i < (size($newSel)); $i++)
+{
+	 //Get what is stored in the .Selections attribute.
+     $attrStr = getAttr ($newSel[$i] + ".Selections");  
+	 //Stores string in the .Selections attribute and removes the end character ';' in this case.
+     $newStr = `substring $attrStr 1 (size($attrStr)-1)`;
+	 //Appends string to the end of the stored attribute.
+     $newStr = ($newStr + "_Point_1");
+	 //Takes the current object and renames it based off of the newly created string.
+     rename $newSel[$i] $newStr;  
+}

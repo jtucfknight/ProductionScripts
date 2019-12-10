@@ -1,0 +1,21 @@
+/*
+Author:         José Torres
+Date:           10/10/2018
+Description:    Turn on displayHandles to view group nodes in viewport.
+*/
+
+//Store selected objects as array.
+string $newSel[] = `ls -sl`;
+//Iterate through object and toggle .displayHandle attribute.
+for ($j = 0; $j < size($newSel); $j++)
+{
+    setAttr ($newSel[$j] + ".displayHandle") 1;
+}
+
+//Turn off displayHandle for group node.
+string $newSel[] = `ls -sl`;
+
+for ($j = 0; $j < size($newSel); $j++)
+{
+    setAttr ($newSel[$j] + ".displayHandle") 0;
+}

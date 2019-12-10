@@ -1,0 +1,201 @@
+//Define functions
+//Create base hierarchy
+global proc createBaseLevel()
+{
+    print ("In the create level function\n");
+    //Query textfield
+    string $modelName = `textField -q -tx modelName`;
+    print ("maingroup_" + $modelName);
+    
+    select -all;
+    //Create group hierarchy
+    string $selection[] = `ls -sl`;
+    group -n ("maingroup_" + $modelName)($selection); 
+    group -n ("NORMAL")($selection);
+    group -n ("hull_group")($selection);
+    group -n ("LOD0_pieces")($selection);
+}
+
+//Check value being passed
+global proc numCheck(int $check)
+{
+    if($check == 0)
+    {
+        print ("\nLeft one Button selected: " + $check);
+        intValueInc($check);
+    }
+    else if($check == -1)
+    {
+        print ("\nRight one Button selected: " + $check);
+        intValueDec($check);
+    }
+        else if($check == -2)
+    {
+        print ("\nLeft two Button selected: " + $check);
+        intValueInc($check);
+    }
+        else if($check == -3)
+    {
+        print ("\nRight two Button selected: " + $check);
+        intValueDec($check);
+    }
+        else if($check == -4)
+    {
+        print ("\nReset pressed: " + $check);
+        intValueInc($check);
+    }   
+}
+//Increment intField
+global proc intValueInc(int $check) 
+{
+    global int $getIntLeft = 1;
+    global int $getIntRight = 1;
+
+    if($check == 0)
+    {
+        $getIntLeft++;
+        intField -edit -value $getIntLeft wheelCol_1;
+    }
+    else if($check == -2)
+    {
+        $getIntRight++;
+        intField -edit -value $getIntRight wheelCol_2;
+    }
+    else if($check == -4)
+    {
+        print("Reset values in text field.\n");
+        $getIntLeft = 1;
+        $getIntRight = 1;
+        intField -edit -value $getIntLeft wheelCol_1;
+        intField -edit -value $getIntRight wheelCol_2;
+    }
+}
+//Decrement intField
+global proc intValueDec(int $check) 
+{
+    global int $getIntLeft = 1;
+    global int $getIntRight = 1;
+    
+    print ("\nValue is: " + $check);
+    if($check == -1)
+    {
+        $getIntLeft--;
+        intField -edit -value $getIntLeft wheelCol_1;
+    }
+    else if($check == -3)
+    {
+        $getIntRight--;
+        intField -edit -value $getIntRight wheelCol_2;
+    }
+} 
+//Create wheel hierarchy
+global proc wheelGroup(int $check_A, int $check_C)
+{  
+    global int $getIntLeft = 1;
+    global int $getIntRight = 1;
+    string $selection[] = `ls -sl`;
+
+    if($check_A == 0)
+    {
+        parent $selection[0] "NORMAL";
+        rename $selection[0] ("wheels_" + $getIntLeft + "_" + $getIntRight);
+        
+        string $newSel[] = `ls -sl`;
+        
+        for ($j = 0; $j < size($newSel); $j++)
+        {
+            group -n ($newSel[$j] + "_group")($newSel[$j]);           
+            group -n ("LOD0_pieces")($newSel[$j]);
+        }
+  
+        numCheck($check_A);
+    }
+    else if($check_C == -2)
+    {
+        rename $selection[0] ("wheels_" + $getIntLeft + "_" + $getIntRight);
+    
+        string $newSel[] = `ls -sl`;
+        for ($j = 0; $j < size($newSel); $j++)
+        {
+            group -n ($newSel[$j] + "_group")($newSel[$j]);
+            group -n ("LOD0_pieces")($newSel[$j]);
+        }     
+        numCheck($check_C);
+    }  
+}
+
+global proc hierarchyNavUp()
+{
+    string $selection[] = `ls -sl`;
+    for($item in $selection)
+    {
+        select $item;
+        string $parent1[] = `listRelatives -f -p $item`;
+        parent $item `listRelatives -f -p $parent1`;
+    }
+    select $selection;
+}
+
+global proc hierarchyNavDown()
+{
+  //TODO: Add functionality
+  print("In the hierarchyNavDown\n");
+}
+
+global proc customGroup()
+{
+    print("In custom group\n");
+    string $selection[] = `ls -sl`;
+    print ("Current selection is: " + $selection[0] + " and " + $selection[1]);
+    parent $selection "NORMAL"; 
+    //Query textfield
+    string $groupName = `textField -q -tx groupName`;
+    print ($groupName);  
+    group -n ($groupName + "_group") $selection;
+    group -n ("LOD0_pieces")($selection);
+}
+//End define functions
+//member variables
+int $check_A = 0;
+int $check_B = -1;
+int $check_C = -2;
+int $check_D = -3;
+int $check_E = -4;
+
+//Define window
+if (`window -exists toolSet`) 
+{
+  deleteUI toolSet;  
+}
+window -title "Jose's Jierarchy Setup" -widthHeight 600 300 toolSet;
+//Gui
+frameLayout -label "Hierarchy Setup";
+    rowLayout -numberOfColumns 3 -columnWidth3 100 95 95 -columnAlign3 "center" "center" "center";
+        text -label "Enter model name: ";
+        textField -w 300  modelName;
+        button -label "Create Base Level" -command "createBaseLevel()";
+setParent..;
+frameLayout -label "Wheel Setup";
+     gridLayout -numberOfColumns 6 -cellWidthHeight 30 20; 
+        intField -value 1 wheelCol_1 ;       
+        button -label "+" -command "numCheck($check_A)" myBtn5;
+        button -label "-" -command "numCheck($check_B)" myBtn6;
+        intField -value 1 wheelCol_2;  
+        button -label "+" -command "numCheck($check_C)" myBtn7;
+        button -label "-" -command "numCheck($check_D)" myBtn8;
+setParent..;
+     rowLayout -numberOfColumns 4 -columnWidth4 95 95 95 95 -columnAlign4 "center" "center" "center" "center";
+        button -label "Wheel Group" -command "wheelGroup($check_A, $check_C)";
+        button -label "Reset Number" -command "numCheck($check_E)";
+        button -label "<--Navigate" -command "hierarchyNavUp()";
+        button -label "Navigate-->" -command "hierarchyNavDown()";
+setParent..;
+frameLayout -label "Custom Groups";
+    rowLayout -numberOfColumns 3 -columnWidth3 100 95 95 -columnAlign3 "center" "center" "center";
+        text -label "Enter group name: ";
+        textField -w 300  groupName;
+        button -label "_group" -command "customGroup()";
+setParent..;
+frameLayout -label ""; 
+showWindow toolSet;
+

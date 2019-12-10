@@ -1,0 +1,26 @@
+//Member variables
+string $array[];
+string $list[];
+string $getFileNode[] = `ls -tex`;
+string $shaders[] = `ls -type "phong"`;
+
+//Loop through shader count
+for ($i=0; $i < size($shaders); $i++)
+{
+    print("Shader is: " + $shaders[0] + "\n");
+    //List file nodes
+    $list = `listConnections $shaders[$i]`;
+    print ("\t\t\t\tFile node is: " + $list[0] + "\n");
+    //Return texture path of file node
+    string $getTextrPath = `getAttr ("" + $list[0] + ".fileTextureName")`;   
+    print("Path is: " + $getTextrPath);
+    //Convert path to array based off delimiters
+    $array = stringToStringArray($getTextrPath, "./");
+    print($array);      
+    print(size($array) + "\n");
+    //Gets the name of the texture file
+    string $storeNewName = ($array[size($array)-2]);
+    print("New name is: " + $storeNewName + "\n"); 
+    //Renames the file node to the texture file name
+    rename $shaders[$i] $storeNewName; 
+}

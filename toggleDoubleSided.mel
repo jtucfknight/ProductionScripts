@@ -1,0 +1,20 @@
+/*
+Author:         José Torres
+Date:           10/10/2018
+Description:    Basic script for turning on or off doubleSided faces.
+*/
+//Turn off double sided on all selected objects
+//Store objects as array		
+string $newSel[] = `ls -sl`;
+//Iterate through array and set .doubleSided attribute to 0 to turn off double sided faces in viewport
+for ($j = 0; $j < size($newSel); $j++)
+{
+    setAttr ($newSel[$j] + ".doubleSided") 0;
+}
+
+string $newSel[] = `ls -sl`;
+//Iterate through array and set .doubleSided attribute to 1 to turn on double sided faces in viewport
+for ($j = 0; $j < size($newSel); $j++)
+{
+    setAttr ($newSel[$j] + ".doubleSided") 1;
+}

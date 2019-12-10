@@ -1,0 +1,20 @@
+/*
+Author:         José Torres
+Date:           1/10/2018
+Description:    Select multiple objects and run command.
+				Deletes extra attributes applied to models that come from Oxygen.
+*/
+
+string $newSel[] = `ls -sl`;
+int $DEL_PROPERTIES = 1;
+
+for ($i = 0; $i < (size($newSel)); $i++)
+{
+    for ($j = 0; $j < ($DEL_PROPERTIES); $j++)
+    {
+        deleteAttr ($newSel[$j] + ".FaceProperties");
+        deleteAttr ($newSel[$j] + ".FaceUserValue");
+        deleteAttr ($newSel[$j] + ".VertexUserValue");
+        deleteAttr ($newSel[$j] + ".VertexProperties");
+    }
+}
